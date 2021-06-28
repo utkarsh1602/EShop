@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load cart %}
+{% block content %}
+
+<br><br>
+<!-- product list part start-->
+    <section class="product_list section_padding30">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-2" style="position: relative;">
+                    <h4>Filters</h4>
+                    <form action="" method="post">
+                        {% csrf_token %}
+                        <hr>
+                        <input type="radio" name="sort" id="price" value="selling_price">
+                        <label for="price">Order by Price</label><br><hr>
+                        <input type="radio" name="sort" id="date" value="arrival">
+                        <label for="date">Order by Date</label><br><hr>
+                        <input type="radio" name="sort" id="rating" value="rating">
+                        <label for="rating">Order by Rating</label><br><hr>
+                        <button type="submit" style="color: Red">Submit</button>
+                    </form>
+                </div>   
+                <div class="col-md-1"></div>
+                <div class="col-md-9">
+                    <div class="product_list">
+                        <div class="row">
+                            {% for product in products %}
+                            <div class="col-lg-4 col-sm-4">
+                                <div class="single_product_item" id={{product.id}}>
+                                    <a href="#">
+                                    <img src="{%static product.image  %}" alt="" class="img-fluid" style="height: 310px;width: 250px;">
+                                    <hr>
+                                    <h5>{{ product.name }}</h5>
+                                    <p>{{ product.brand }}</p>
+                                    <p class="fw-light text-decoration-line-through"><i>₹ {{ product.retail_price }}</i></p>
+                                    <p class="text-success">₹ {{ product.selling_price }}</p>
+                                    {% for i in product.rating|times %}
+                                    <i class="bi-star-fill" style="color: Green"></i>
+                                    {% endfor %}
+                                    </a>
+                                    <hr>
+                                    {% if product.id|is_in_cart:request.session.cart %}
+                                    <form action='' method='post'>
+                                        {% csrf_token %}
+                                        <input type="hidden" name="prod_id" value="{{product.id}}">
+                                        <button type="submit" class="btn btn-info" style="color: Black"><i class="bi-cart"></i>Add More +{{product.id|quantity:request.session.cart}}</button> 
+                                    </form>
+                                    {% else %}
+                                    <form action='/list/{{product.category}}/#{{product.id}}' method='post'>
+                                        {% csrf_token %}
+                                        <input type="hidden" name="prod_id" value="{{product.id}}">
+                                        <button type="submit" class="btn btn-primary"><i class="bi-cart"></i> Add to Cart</button>
+                                    </form>
+                                    {% endif %}
+                                    
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        <div class="load_more_btn text-center">
+                            <a href="#" class="btn_3">Load More</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- product list part end-->
+<br><br>
+
+{% endblock %}    
